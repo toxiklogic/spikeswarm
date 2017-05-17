@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class Combatant : MonoBehaviour
 {
+	private class IdleState : StateMachine.State
+	{
+
+	}
+
 	// Use this for initialization
 	void Start ()
 	{
