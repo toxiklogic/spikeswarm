@@ -2,15 +2,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Command : MonoBehaviour {
+public class Command : MonoBehaviour
+{
+	public enum CommandType
+	{
+		DIR_UP,
+		DIR_DOWN,
+		DIR_LEFT,
+		DIR_RIGHT,
+		BULLET,
+		MINE,
+		MINIBOT,
+		STOP,
+		MAX,
+	};
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+	public SpriteRenderer Background;
+	public SpriteRenderer Icon;
+
+	public void Setup(Color bgColor, Sprite icon)
+	{
+		Background.color = bgColor;
+		Icon.sprite = icon;
 	}
 }

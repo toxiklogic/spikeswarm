@@ -5,6 +5,9 @@ using UnityEngine.Networking;
 
 public class CommandSpawner : NetworkBehaviour
 {
+	// Referene to game data
+	public GameData GameData;
+
 	// Reference to command prefab
 	public GameObject CommandPrefab;
 
@@ -36,12 +39,42 @@ public class CommandSpawner : NetworkBehaviour
 		float x = Random.Range(SpawnMin.position.x, SpawnMax.position.x);
 		float z = Random.Range(SpawnMin.position.z, SpawnMax.position.z);
 
-		RpcSpawnCommand(x, z);
+		Command.CommandType type = ChooseCommandType();
+		RpcSpawnCommand(x, z, type);
+	}
+
+	private Command.CommandType ChooseCommandType()
+	{
+		// TODO AI
+		return (Command.CommandType)Random.Range(0, (int)Command.CommandType.MAX);
 	}
 
 	[ClientRpc]
-	private void RpcSpawnCommand(float x, float z)
+	private void RpcSpawnCommand(float x, float z, Command.CommandType type)
 	{
-		GameObject.Instantiate(CommandPrefab, new Vector3(x, 0.0f, z), Quaternion.identity);
+		GameObject go = GameObject.Instantiate(CommandPrefab, new Vector3(x, 0.0f, z), Quaternion.identity);
+
+		if(go == null)
+		{
+			Debug.LogError("failed to instantiate command");
+			return;
+		}
+
+		Command command = go.GetComponent<Command>();
+
+		if(command == null)
+		{
+			Debug.LogError("failed to instantiate command");
+			return;
+		}
+
+		for(int i = 0; i < GameData.CommandIconSpriteInfos.Length; i++)
+		{
+			if(GameData.CommandIconSpriteInfos[i].Type == type)
+			{
+				command.Setup(GameData.CommandIconSpriteInfos[i].BackgroundColor, GameData.CommandIconSpriteInfos[i].Icon);
+				break;
+			}
+		}
 	}
 }
