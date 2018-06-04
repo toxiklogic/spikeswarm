@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class StateMachine
 {
-	private List<State> _states;
+	private List<State> _states = new List<State>();
 	private State _currentState = null;
 
 	public class State
@@ -44,6 +44,17 @@ public class StateMachine
 
 	public void ChangeState(State nextState)
 	{
+		State state = _states.Find(x => x == nextState);
 
+		if (state == null)
+			return;
+
+		if (_currentState != null)
+		{
+			_currentState.Exit();
+		}
+
+		_currentState = state;
+		_currentState.Enter();
 	}
 }
