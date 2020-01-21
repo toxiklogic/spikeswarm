@@ -15,9 +15,14 @@ public class CommandSpawner : NetworkBehaviour
 	public Transform SpawnMin;
 	public Transform SpawnMax;
 
+	// Maximum amount of commands allowed on the playing field at once
+	public int MaxCommandCount;
+
     // Minimum and maximum time values for command spawn
     public float RandomSpawnTimeMin;
     public float RandomSpawnTimeMax;
+
+	private List<Command> _spawnedCommands = new List<Command>();
 
     float _nextSpawnTime;
 
@@ -30,12 +35,17 @@ public class CommandSpawner : NetworkBehaviour
 	void Update ()
 	{
 		// Server authoratative
-		if (isServer && Time.time > _nextSpawnTime)
+		if (isServer && CanSpawnCommand())
 		{
 			ServerSpawnCommand();
 
 			_nextSpawnTime = Time.time + Random.Range(RandomSpawnTimeMin, RandomSpawnTimeMax);
 		}
+	}
+
+	private bool CanSpawnCommand()
+	{
+		return Time.time > _nextSpawnTime && _spawnedCommands.Count < MaxCommandCount;
 	}
 
 	private void ServerSpawnCommand()
@@ -58,7 +68,7 @@ public class CommandSpawner : NetworkBehaviour
 	{
 		GameObject go = GameObject.Instantiate(CommandPrefab, new Vector3(x, 0.0f, z), Quaternion.identity);
 
-		if(go == null)
+		if (go == null)
 		{
 			Debug.LogError("failed to instantiate command");
 			return;
@@ -66,19 +76,24 @@ public class CommandSpawner : NetworkBehaviour
 
 		Command command = go.GetComponent<Command>();
 
-		if(command == null)
+		if (command == null)
 		{
 			Debug.LogError("failed to instantiate command");
 			return;
 		}
 
-		for(int i = 0; i < GameData.CommandIconSpriteInfos.Length; i++)
+		for (int i = 0; i < GameData.CommandIconSpriteInfos.Length; i++)
 		{
-			if(GameData.CommandIconSpriteInfos[i].Type == type)
+			if (GameData.CommandIconSpriteInfos[i].Type == type)
 			{
 				command.Setup(GameData.CommandIconSpriteInfos[i].BackgroundColor, GameData.CommandIconSpriteInfos[i].Icon);
 				break;
 			}
+		}
+
+		if (isServer)
+		{
+			_spawnedCommands.Add(command);
 		}
 	}
 }
