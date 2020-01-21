@@ -5,14 +5,13 @@ using UnityEngine.Networking;
 
 public class PlayerController : NetworkBehaviour
 {
+    private float _originalY;
 
-	// Use this for initialization
 	void Start ()
 	{
-		
-	}
+        _originalY = transform.position.y;
+    }
 	
-	// Update is called once per frame
 	void Update ()
 	{
 		// TODO: setup pooled updates
@@ -22,11 +21,11 @@ public class PlayerController : NetworkBehaviour
 		var x = Input.GetAxis("Horizontal") * 0.1f;
 		var z = Input.GetAxis("Vertical") * 0.1f;
 
-		transform.Translate(x, 0, z);
+		transform.Translate(x, _originalY, z);
 	}
 
 	public override void OnStartLocalPlayer()
 	{
-		GetComponent<MeshRenderer>().material.color = Color.red;
+		GetComponentInChildren<MeshRenderer>().material.color = Color.red;
 	}
 }

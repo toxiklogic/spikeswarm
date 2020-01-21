@@ -4,20 +4,61 @@ using UnityEngine;
 
 public class Combatant : MonoBehaviour
 {
-	private class IdleState : StateMachine.State
-	{
+    public Transform CommandAttachPoint;
 
-	}
+    private Command _closestCommand;
+    private Command _holdingCommand;
 
-	// Use this for initialization
-	void Start ()
-	{
-		
-	}
-	
-	// Update is called once per frame
-	void Update ()
-	{
-		
-	}
+    private class IdleState : StateMachine.State
+    {
+
+    }
+
+    void Start()
+    {
+
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            // Picking up a command
+            if (_closestCommand != null && !IsHoldingCommmand())
+            {
+                PickupCommand();
+            }
+            // Dropping a command
+            else if (IsHoldingCommmand())
+            {
+                _holdingCommand.transform.SetParent(null);
+                _holdingCommand = null;
+            }
+        }
+    }
+
+    void PickupCommand()
+    {
+        _closestCommand.transform.SetParent(CommandAttachPoint);
+        _closestCommand.transform.localPosition = Vector3.zero;
+        _holdingCommand = _closestCommand;
+        _closestCommand = null;
+    }
+
+    public void OnEnterCommandPickup(Command command)
+    {
+        if (_closestCommand == null)
+            _closestCommand = command;
+    }
+
+    public void OnExitCommandPickup(Command command)
+    {
+        if (_closestCommand == command)
+            _closestCommand = null;
+    }
+
+    private bool IsHoldingCommmand()
+    {
+        return _holdingCommand != null;
+    }
 }

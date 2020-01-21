@@ -15,11 +15,15 @@ public class CommandSpawner : NetworkBehaviour
 	public Transform SpawnMin;
 	public Transform SpawnMax;
 
-	float _nextSpawnTime;
+    // Minimum and maximum time values for command spawn
+    public float RandomSpawnTimeMin;
+    public float RandomSpawnTimeMax;
+
+    float _nextSpawnTime;
 
 	private void Start()
 	{
-		_nextSpawnTime = Time.time + Random.Range(0.5f, 1.0f);
+		_nextSpawnTime = Time.time + Random.Range(RandomSpawnTimeMin, RandomSpawnTimeMax);
 	}
 
 	// Update is called once per frame
@@ -30,7 +34,7 @@ public class CommandSpawner : NetworkBehaviour
 		{
 			ServerSpawnCommand();
 
-			_nextSpawnTime = Time.time + Random.Range(0.5f, 1.0f);
+			_nextSpawnTime = Time.time + Random.Range(RandomSpawnTimeMin, RandomSpawnTimeMax);
 		}
 	}
 
