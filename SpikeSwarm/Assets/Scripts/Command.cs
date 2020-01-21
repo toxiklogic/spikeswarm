@@ -19,11 +19,13 @@ public class Command : MonoBehaviour
 
 	public SpriteRenderer Background;
 	public SpriteRenderer Icon;
+	public int UniqueId;
 
-	public void Setup(Color bgColor, Sprite icon)
+	public void Setup(Color bgColor, Sprite icon, int uniqueId)
 	{
 		Background.color = bgColor;
 		Icon.sprite = icon;
+		UniqueId = uniqueId;
 	}
 
     private void OnTriggerEnter(Collider other)

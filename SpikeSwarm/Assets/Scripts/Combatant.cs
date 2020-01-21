@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class Combatant : MonoBehaviour
+public class Combatant : NetworkBehaviour
 {
     public Transform CommandAttachPoint;
 
@@ -16,7 +17,10 @@ public class Combatant : MonoBehaviour
 
     void Start()
     {
-
+		if(isServer)
+		{
+			Arena.Instance.ServerSpawnMech();
+		}
     }
 
     void Update()
@@ -26,13 +30,15 @@ public class Combatant : MonoBehaviour
             // Picking up a command
             if (_closestCommand != null && !IsHoldingCommmand())
             {
-                PickupCommand();
+				//PickupCommand();
+				CmdPickupCommand(_closestCommand.UniqueId);
             }
             // Dropping a command
             else if (IsHoldingCommmand())
             {
-                _holdingCommand.transform.SetParent(null);
-                _holdingCommand = null;
+				//_holdingCommand.transform.SetParent(null);
+				//_holdingCommand = null;
+				CmdDropCommand();
             }
         }
     }
@@ -44,6 +50,12 @@ public class Combatant : MonoBehaviour
         _holdingCommand = _closestCommand;
         _closestCommand = null;
     }
+
+	void PickupCommand(Command command)
+	{
+		_closestCommand = command;
+		PickupCommand();
+	}
 
     public void OnEnterCommandPickup(Command command)
     {
@@ -61,4 +73,37 @@ public class Combatant : MonoBehaviour
     {
         return _holdingCommand != null;
     }
+
+	[Command]
+	private void CmdPickupCommand(int commandId)
+	{
+		RpcPickupCommand(commandId);
+	}
+
+	[ClientRpc]
+	private void RpcPickupCommand(int commandId)
+	{
+		// Server checks if we can pickup this command
+		Command[] commands = FindObjectsOfType<Command>();
+		foreach (Command command in commands)
+		{
+			if (command.UniqueId == commandId)
+			{
+				PickupCommand(command);
+			}
+		}
+	}
+
+	[Command]
+	private void CmdDropCommand()
+	{
+		RpcDropCommand();
+	}
+
+	[ClientRpc]
+	private void RpcDropCommand()
+	{
+		_holdingCommand.transform.SetParent(null);
+		_holdingCommand = null;
+	}
 }
