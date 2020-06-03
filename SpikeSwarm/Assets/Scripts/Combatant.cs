@@ -6,6 +6,7 @@ using UnityEngine.Networking;
 public class Combatant : NetworkBehaviour
 {
     public Transform CommandAttachPoint;
+    public Mech Mech;
 
     private Command _closestCommand;
     private Command _holdingCommand;
@@ -19,12 +20,15 @@ public class Combatant : NetworkBehaviour
     {
 		if(isServer)
 		{
-			Arena.Instance.ServerSpawnMech();
+			Arena.Instance.ServerOnCombatantJoined(this);
 		}
     }
 
     void Update()
     {
+        if (!isLocalPlayer || !Arena.Instance.GameStarted)
+            return;
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
             // Picking up a command

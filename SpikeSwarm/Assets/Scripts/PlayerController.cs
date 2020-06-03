@@ -14,9 +14,9 @@ public class PlayerController : NetworkBehaviour
 	
 	void Update ()
 	{
-		// TODO: setup pooled updates
-		if (!isLocalPlayer)
-			return;
+        // TODO: setup pooled updates
+        if (!isLocalPlayer || !Arena.Instance.GameStarted)
+            return;
 
 		var x = Input.GetAxis("Horizontal") * 0.1f;
 		var z = Input.GetAxis("Vertical") * 0.1f;

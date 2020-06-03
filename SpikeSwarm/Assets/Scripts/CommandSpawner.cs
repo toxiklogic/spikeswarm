@@ -24,16 +24,27 @@ public class CommandSpawner : NetworkBehaviour
 
 	private List<Command> _spawnedCommands = new List<Command>();
 
+    private bool _spawning;
     float _nextSpawnTime;
 	int _nextUniqueId = 0;
 
 	private void Start()
 	{
-		_nextSpawnTime = Time.time + Random.Range(RandomSpawnTimeMin, RandomSpawnTimeMax);
+        _spawning = false;
 	}
 
-	// Update is called once per frame
-	void Update ()
+    private void OnEnable()
+    {
+        GameEvents.OnGameStarted += GameEvents_OnGameStarted;
+    }
+
+    private void OnDisable()
+    {
+        GameEvents.OnGameStarted -= GameEvents_OnGameStarted;
+    }
+
+    // Update is called once per frame
+    void Update ()
 	{
 		// Server authoratative
 		if (isServer && CanSpawnCommand())
@@ -46,7 +57,7 @@ public class CommandSpawner : NetworkBehaviour
 
 	private bool CanSpawnCommand()
 	{
-		return Time.time > _nextSpawnTime && _spawnedCommands.Count < MaxCommandCount;
+		return _spawning && Time.time > _nextSpawnTime && _spawnedCommands.Count < MaxCommandCount;
 	}
 
 	private void ServerSpawnCommand()
@@ -97,4 +108,10 @@ public class CommandSpawner : NetworkBehaviour
 			_spawnedCommands.Add(command);
 		}
 	}
+
+    private void GameEvents_OnGameStarted()
+    {
+        _spawning = true;
+        _nextSpawnTime = Time.time + Random.Range(RandomSpawnTimeMin, RandomSpawnTimeMax);
+    }
 }

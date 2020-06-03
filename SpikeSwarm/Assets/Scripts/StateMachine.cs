@@ -4,9 +4,6 @@ using UnityEngine;
 
 public class StateMachine
 {
-	private List<State> _states = new List<State>();
-	private State _currentState = null;
-
 	public class State
 	{
 		public virtual void Enter() { }
@@ -14,7 +11,12 @@ public class StateMachine
 		public virtual void Exit() { }
 	}
 
-	public void AddState(State state)
+    private List<State> _states = new List<State>();
+    private State _currentState = null;
+
+    public State CurrentState { get { return _currentState; } }
+
+    public void AddState(State state)
 	{
 		if (state == null)
 			return;
@@ -22,15 +24,14 @@ public class StateMachine
 		_states.Add(state);
 	}
 
-	public void ChangeState<T>() where T : State, new()
+	public void ChangeState<T>() where T : State
 	{
 		State state = _states.Find(x => x.GetType() == typeof(T));
 
-		// State does not exist yet, add it
+		// State does not exist yet
 		if(state == null)
 		{
-			state = new T();
-			_states.Add(state);
+            Debug.LogError(state.ToString() + " does not exist");
 		}
 
 		if(_currentState != null)
@@ -57,4 +58,10 @@ public class StateMachine
 		_currentState = state;
 		_currentState.Enter();
 	}
+
+    public void Update()
+    {
+        if (_currentState != null)
+            _currentState.Update();
+    }
 }
