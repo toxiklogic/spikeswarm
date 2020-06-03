@@ -20,13 +20,44 @@ public class Command : MonoBehaviour
 	public SpriteRenderer Background;
 	public SpriteRenderer Icon;
 	public int UniqueId;
+    public AnimationCurve DropCurve;
+    public float DropDuration;
 
-	public void Setup(Color bgColor, Sprite icon, int uniqueId)
+    private CommandType _commandType;
+    private bool _dropping;
+    private float _dropTime;
+    private float _dropStartY;
+
+    public CommandType Type { get { return _commandType; } }
+
+	public void Setup(Color bgColor, Sprite icon, int uniqueId, CommandType type)
 	{
 		Background.color = bgColor;
 		Icon.sprite = icon;
 		UniqueId = uniqueId;
-	}
+        _commandType = type;
+    }
+
+    public void Drop()
+    {
+        _dropping = true;
+        _dropTime = 0.0f;
+        _dropStartY = transform.position.y;
+    }
+
+    private void Update()
+    {
+        if(_dropping)
+        {
+            _dropTime += Time.deltaTime;
+            Vector3 position = transform.position;
+            position.y = Mathf.Lerp(0.0f, _dropStartY, _dropStartY * DropCurve.Evaluate(_dropTime / DropDuration));
+            transform.position = position;
+
+            if (_dropTime >= DropDuration)
+                _dropping = false;
+        }
+    }
 
     private void OnTriggerEnter(Collider other)
     {

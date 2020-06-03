@@ -62,23 +62,41 @@ public class Arena : NetworkBehaviour
     {
         public PlayState(Arena context) : base(context) { }
 
+        public override void Enter()
+        {
+            GameEvents.TriggerGameStarted();
+        }
     }
 
     public static Arena Instance;
 
+    public CommandSpawner CommandSpawner;
 	public GameObject MechPrefab;
 	public Transform[] MechSpawnPoints;
 
     private StateMachine _stateMachine;
     private List<Combatant> _combatants = new List<Combatant>();
+    private Mech[] _mechs = new Mech[PLAYER_COUNT];
+
+    static int PLAYER_COUNT = 2;
 
 	void Awake()
 	{
 		Instance = this;
         InitializeStateMachine();
     }
-	
-	void Update ()
+
+    private void OnEnable()
+    {
+        GameEvents.OnExecuteCommand += GameEvents_OnExecuteCommand;
+    }
+
+    private void OnDisable()
+    {
+        GameEvents.OnExecuteCommand -= GameEvents_OnExecuteCommand;
+    }
+
+    void Update ()
 	{
         _stateMachine.Update();
 	}
@@ -102,7 +120,7 @@ public class Arena : NetworkBehaviour
         _combatants.Add(combatant);
 		RpcSpawnMechs(_combatants.Count);
 
-        if (_combatants.Count == 2)
+        if (_combatants.Count == PLAYER_COUNT)
         {
             RpcStartCountdown();
         }
@@ -113,8 +131,13 @@ public class Arena : NetworkBehaviour
 	{
         for (int i = 0; i < playerCount; i++)
         {
+            if (_mechs[i] != null)
+                continue;
+
             GameObject go = Instantiate(MechPrefab, MechSpawnPoints[i].position, MechSpawnPoints[i].rotation);
             go.transform.position = MechSpawnPoints[i].position;
+
+            _mechs[i] = go.GetComponent<Mech>();
         }
 	}
 
@@ -129,5 +152,20 @@ public class Arena : NetworkBehaviour
     private void RpcStartGame()
     {
         _stateMachine.ChangeState<PlayState>();
+    }
+
+    [ClientRpc]
+    private void RpcExecuteCommand(int mechIndex, Command.CommandType type)
+    {
+        _mechs[mechIndex].ExecuteCommand(type);
+    }
+
+    private void GameEvents_OnExecuteCommand(int mechIndex, Command.CommandType type, int id)
+    {
+        if(isServer)
+        {
+            RpcExecuteCommand(mechIndex, type);
+            CommandSpawner.ServerRemoveCommand(id);
+        }
     }
 }

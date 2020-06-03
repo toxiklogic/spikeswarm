@@ -108,6 +108,7 @@ public class Combatant : NetworkBehaviour
 	private void RpcDropCommand()
 	{
 		_holdingCommand.transform.SetParent(null);
+        _holdingCommand.Drop();
 		_holdingCommand = null;
 	}
 }

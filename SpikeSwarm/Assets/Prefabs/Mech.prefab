@@ -44,6 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a30dbcd2e202604f9a430bd847d27d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AnimationController: {fileID: 7661642394547647485}
+  MoveSpeed: 2.5
+  MoveDuration: 1.5
 --- !u!1001 &7766123303235202973
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -107,3 +110,15 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 7766123303235202973}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7661642394547647485 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114086242536283232, guid: f2ca5b1af14fcdb4da58ec003e1f0a21,
+    type: 3}
+  m_PrefabInstance: {fileID: 7766123303235202973}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3bbab8ac2976d9478cd66107aa125f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

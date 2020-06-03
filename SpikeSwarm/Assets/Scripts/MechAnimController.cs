@@ -74,4 +74,14 @@ public class MechAnimController : MonoBehaviour
 			_mechAnimStateMachine.ChangeState(_walkState);
 		}
 	}
+
+    public void Walk()
+    {
+        _mechAnimStateMachine.ChangeState(_walkState);
+    }
+
+    public void Idle()
+    {
+        _mechAnimStateMachine.ChangeState(_idleState);
+    }
 }

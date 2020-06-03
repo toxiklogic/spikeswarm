@@ -69,6 +69,11 @@ public class CommandSpawner : NetworkBehaviour
 		RpcSpawnCommand(x, z, type, _nextUniqueId++);
 	}
 
+    public void ServerRemoveCommand(int id)
+    {
+        RpcRemoveCommand(id);
+    }
+
 	private Command.CommandType ChooseCommandType()
 	{
 		// TODO AI
@@ -98,16 +103,30 @@ public class CommandSpawner : NetworkBehaviour
 		{
 			if (GameData.CommandIconSpriteInfos[i].Type == type)
 			{
-				command.Setup(GameData.CommandIconSpriteInfos[i].BackgroundColor, GameData.CommandIconSpriteInfos[i].Icon, uniqueId);
+				command.Setup(GameData.CommandIconSpriteInfos[i].BackgroundColor, GameData.CommandIconSpriteInfos[i].Icon, uniqueId, type);
 				break;
 			}
 		}
 
-		if (isServer)
-		{
-			_spawnedCommands.Add(command);
-		}
+		//if (isServer)
+		//{
+		_spawnedCommands.Add(command);
+		//}
 	}
+
+    [ClientRpc]
+    private void RpcRemoveCommand(int id)
+    {
+        for (int i = 0; i < _spawnedCommands.Count; i++)
+        {
+            if (_spawnedCommands[i].UniqueId == id)
+            {
+                Destroy(_spawnedCommands[i].gameObject);
+                _spawnedCommands.RemoveAt(i);
+                break;
+            }
+        }
+    }
 
     private void GameEvents_OnGameStarted()
     {
